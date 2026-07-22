@@ -1,0 +1,537 @@
+<title>CyberSentinel Solutions — AI-Augmented Red Team, Nothing Leaves the Room</title>
+
+<style>
+  :root {
+    color-scheme: light;
+    --paper:    #eaebe4;
+    --paper-2:  #e2e3da;
+    --ink:      #17170f;
+    --graphite: #57584c;
+    --stamp:    #9c3a2a;
+    --stamp-ink:#ffffff;
+    --redact:   #100f0c;
+    --line:     rgba(23,23,15,0.14);
+    --line-strong: rgba(23,23,15,0.28);
+    --good:     #3f6b34;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "IBM Plex Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Noto Serif", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --paper:    #121210;
+      --paper-2:  #1a1a17;
+      --ink:      #e9e7dc;
+      --graphite: #a6a495;
+      --stamp:    #d4604a;
+      --stamp-ink:#141210;
+      --redact:   #050504;
+      --line:     rgba(233,231,220,0.14);
+      --line-strong: rgba(233,231,220,0.30);
+      --good:     #7fae6e;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper:    #121210;
+    --paper-2:  #1a1a17;
+    --ink:      #e9e7dc;
+    --graphite: #a6a495;
+    --stamp:    #d4604a;
+    --stamp-ink:#141210;
+    --redact:   #050504;
+    --line:     rgba(233,231,220,0.14);
+    --line-strong: rgba(233,231,220,0.30);
+    --good:     #7fae6e;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --paper:    #eaebe4;
+    --paper-2:  #e2e3da;
+    --ink:      #17170f;
+    --graphite: #57584c;
+    --stamp:    #9c3a2a;
+    --stamp-ink:#ffffff;
+    --redact:   #100f0c;
+    --line:     rgba(23,23,15,0.14);
+    --line-strong: rgba(23,23,15,0.28);
+    --good:     #3f6b34;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--stamp); color: var(--stamp-ink); }
+
+  a { color: inherit; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 28px; }
+
+  .mono { font-family: var(--mono); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--graphite);
+  }
+  h1, h2, h3 { font-family: var(--mono); text-wrap: balance; margin: 0; font-weight: 700; }
+  p { max-width: 62ch; color: var(--ink); }
+  .lede { color: var(--graphite); max-width: 58ch; }
+
+  /* ---------- redaction-bar rule, used as section divider ---------- */
+  .redact-rule {
+    height: 10px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--redact) 0px, var(--redact) 46px,
+      transparent 46px, transparent 58px
+    );
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  /* ---------- header / stamp block ---------- */
+  header.brief {
+    padding: 54px 0 42px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .brief-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin-bottom: 34px;
+  }
+  .wordmark {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+  }
+  .wordmark b { color: var(--stamp); }
+  .case-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--graphite);
+    text-align: right;
+  }
+  .thesis {
+    font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    max-width: 16ch;
+  }
+  .thesis .cut { color: var(--stamp); }
+  .brief-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .seal {
+    flex: none;
+    width: 92px; height: 92px;
+    border: 2px solid var(--stamp);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--stamp);
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+    transform: rotate(-9deg);
+    opacity: 0.9;
+    padding: 6px;
+  }
+
+  section { padding: 56px 0; }
+  section + section { border-top: 1px solid var(--line); }
+
+  .row-label {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .row-label { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  /* ---------- redaction demo ---------- */
+  .demo {
+    background: var(--paper-2);
+    border: 1px solid var(--line-strong);
+    padding: 22px 24px;
+    margin-top: 22px;
+  }
+  .demo-label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--graphite);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .demo pre {
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+  .redacted {
+    background: var(--redact);
+    color: var(--redact);
+    border-radius: 2px;
+    padding: 0 4px;
+    cursor: help;
+    transition: background 0.15s ease;
+    position: relative;
+  }
+  .redacted:hover, .redacted:focus-visible {
+    background: transparent;
+    outline: 1px dashed var(--stamp);
+    color: var(--stamp);
+  }
+  .demo-note {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--graphite);
+  }
+  .demo-note b { color: var(--good); }
+
+  /* ---------- capability stack ---------- */
+  .stack-item {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 18px;
+    padding: 26px 0;
+  }
+  .stack-item + .stack-item { border-top: 1px solid var(--line); }
+  .stack-letter {
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--stamp);
+    font-size: 15px;
+  }
+  .stack-item h3 { font-size: 19px; margin-bottom: 8px; }
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: grid;
+    gap: 7px;
+  }
+  .feature-list li {
+    font-size: 15px;
+    color: var(--graphite);
+    padding-left: 18px;
+    position: relative;
+  }
+  .feature-list li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--stamp);
+    font-family: var(--mono);
+  }
+
+  /* ---------- stat dossier ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--line-strong);
+    border: 1px solid var(--line-strong);
+    margin-top: 22px;
+  }
+  .stat {
+    background: var(--paper);
+    padding: 22px 18px;
+  }
+  .stat b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 30px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .stat span {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--graphite);
+    line-height: 1.4;
+  }
+
+  /* ---------- engagement tiers ---------- */
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 24px;
+  }
+  @media (max-width: 780px) {
+    .tiers { grid-template-columns: 1fr; }
+  }
+  .tier {
+    border: 1px solid var(--line-strong);
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tier .eyebrow { color: var(--stamp); }
+  .tier h3 { font-size: 18px; }
+  .tier p { color: var(--graphite); font-size: 14.5px; max-width: none; }
+
+  /* ---------- compliance strip ---------- */
+  .compliance {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .compliance-item {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--graphite);
+    max-width: 26ch;
+    padding-left: 16px;
+    border-left: 2px solid var(--stamp);
+  }
+
+  /* ---------- closing seal / CTA ---------- */
+  .closing {
+    text-align: center;
+    padding: 72px 0 80px;
+  }
+  .closing .eyebrow { display: block; margin-bottom: 18px; }
+  .closing h2 { font-size: clamp(26px, 4vw, 38px); max-width: 22ch; margin: 0 auto; }
+  .cta {
+    margin-top: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--stamp-ink);
+    background: var(--stamp);
+    padding: 15px 28px;
+    border: 1px solid var(--stamp);
+    transition: opacity 0.15s ease;
+  }
+  .cta:hover { opacity: 0.86; }
+  .closing-meta {
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--graphite);
+    letter-spacing: 0.04em;
+  }
+
+  footer {
+    border-top: 1px solid var(--line-strong);
+    padding: 22px 0 40px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--graphite);
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in {
+      animation: fadeIn 0.6s ease both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  }
+</style>
+
+<header class="brief">
+  <div class="wrap">
+    <div class="brief-top fade-in">
+      <div class="wordmark">CYBER<b>SENTINEL</b> SOLUTIONS LTD</div>
+      <div class="case-meta">
+        BRIEFING REF. CSS/AI-RT/UK &nbsp;·&nbsp; FOR AUTHORISED PROSPECTS ONLY
+      </div>
+    </div>
+
+    <div class="fade-in" style="animation-delay:.05s">
+      <p class="eyebrow" style="margin-bottom:14px;">AI-Augmented Offensive Security — UK Engagements</p>
+      <h1 class="thesis">Your testers get frontier AI.<br>Your clients' data <span class="cut">never leaves the room.</span></h1>
+    </div>
+
+    <div class="brief-sub fade-in" style="animation-delay:.1s">
+      <p class="lede">Two systems, deployed together: a fine-tuned red-team model that never phones home, and a de-identifying gateway for when you need a frontier model anyway. Either way, nothing identifying a client, a host, or a secret leaves your perimeter unredacted.</p>
+      <div class="seal">AI RISK<br>CONTAINED<br>BY DESIGN</div>
+    </div>
+  </div>
+</header>
+
+<div class="redact-rule"></div>
+
+<section>
+  <div class="wrap">
+    <div class="row-label">
+      <p class="eyebrow">The problem</p>
+      <div>
+        <h2 style="font-size:24px; margin-bottom:14px;">AI tools speed up pentesting. They also speak to servers you don't control.</h2>
+        <p>A tester pastes a host, a finding, a credential fragment into a public LLM to get a faster write-up or a second opinion on an exploit chain. That prompt now sits on a third party's infrastructure — outside the engagement's confidentiality terms, outside your NDA, and arguably outside what UK GDPR calls data minimisation. Most firms respond by banning AI tools outright, and lose the speed. A smaller number use them carelessly, and take on risk nobody signed off on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="row-label">
+      <p class="eyebrow">Proof, not a promise</p>
+      <div>
+        <h2 style="font-size:22px; margin-bottom:6px;">What actually leaves the building</h2>
+        <p class="lede" style="margin-bottom:0;">A real prompt, before and after the gateway. Hover the black bars.</p>
+      </div>
+    </div>
+
+    <div class="demo">
+      <div class="demo-label"><span>DRAFTED BY TESTER — NEVER TRANSMITTED</span><span class="mono">■ local</span></div>
+      <pre>Client <span class="redacted" title="Acme Retail Bank plc">██████████</span>'s domain controller
+<span class="redacted" title="DC01-LON (10.42.6.12)">██████████████████</span> is vulnerable to
+Zerologon. Admin credential recovered:
+<span class="redacted" title="s3cr3t-Rrz!99">██████████████</span></pre>
+      <div class="demo-note">↓ routed through <b>CSS Privacy Gateway</b> before it reaches any external model</div>
+      <div class="demo-label" style="margin-top:18px;"><span>WHAT THE PROVIDER RECEIVES</span><span class="mono">■ egress</span></div>
+      <pre>Client [ORG_A]'s domain controller [HOST_A]
+([IP_REDACTED]) is vulnerable to Zerologon.
+Admin credential recovered: [SECRET_REDACTED]</pre>
+      <div class="demo-note">Reply comes back through the gateway and is re-hydrated to real names for the tester only — the provider never learns the mapping.</div>
+    </div>
+  </div>
+</section>
+
+<div class="redact-rule"></div>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:28px;">The stack — two systems, one perimeter</p>
+
+    <div class="stack-item">
+      <div class="stack-letter">A</div>
+      <div>
+        <h3>CSS Privacy Gateway</h3>
+        <p>A de-identifying reverse proxy that sits between your team and any external LLM. One egress IP, one account — the provider sees a single anonymous origin, never your analysts, never your clients.</p>
+        <ul class="feature-list">
+          <li>Secret redaction — API keys, private keys, high-entropy tokens stripped irreversibly before egress</li>
+          <li>Reversible pseudonymisation — client, product, host and domain names swapped for placeholders outbound, restored inbound</li>
+          <li>STRONG mode — AST-level identifier renaming that preserves code semantics, native for Python, tree-sitter for JS/TS/JSX/TSX/Go/Rust</li>
+          <li>Per-client rate limits and daily token budgets, with overrides</li>
+          <li>Streaming-safe — pseudonymisation holds even when a secret splits across SSE chunk boundaries</li>
+          <li>Full observability — Prometheus metrics, a live Grafana dashboard, structured audit logging</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stack-item">
+      <div class="stack-letter">B</div>
+      <div>
+        <h3>cssltd-redteam</h3>
+        <p>A fine-tuned model that runs entirely on infrastructure you control. For the routine 80% of questions — methodology, tool syntax, report phrasing — nothing ever needs to leave the room at all.</p>
+        <ul class="feature-list">
+          <li>Fine-tuned on curated CSSLTD red-team methodology and engagement-report style, iterating with every training round</li>
+          <li>Grounded in real technical corpora, not model memory — full Kali Tools catalogue and Linux manual pages, indexed and retrievable</li>
+          <li>Benchmarked against the base model on every release by an independent judge model, not by feel</li>
+          <li>Deploys on-premise or air-gapped — no engagement data ever needs an internet route</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:6px;">Dossier — where the numbers come from</p>
+    <p class="lede">Pulled from the live build, not a slide.</p>
+    <div class="stats">
+      <div class="stat"><b>772</b><span>Kali Linux tools indexed with usage examples, not summarised</span></div>
+      <div class="stat"><b>3,000+</b><span>Linux manual pages — user commands &amp; system administration</span></div>
+      <div class="stat"><b>4</b><span>independent technical corpora feeding retrieval, continuously updated</span></div>
+      <div class="stat"><b>80%</b><span>win rate vs. the base model on independent judged evaluation</span></div>
+      <div class="stat"><b>0</b><span>engagement identifiers stored by any external model provider</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="redact-rule"></div>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:8px;">How an engagement starts</p>
+    <h2 style="font-size:24px; margin-bottom:8px;">Three ways in — pick the one that matches your risk appetite</h2>
+    <div class="tiers">
+      <div class="tier">
+        <p class="eyebrow">01 — Pilot Briefing</p>
+        <h3>Prove it on one engagement</h3>
+        <p>The gateway and the model run alongside your existing tooling on a single live engagement. No workflow changes, no procurement cycle — just a before/after on speed and a redaction audit trail you can show your DPO.</p>
+      </div>
+      <div class="tier">
+        <p class="eyebrow">02 — Embedded Deployment</p>
+        <h3>Built into how your team already works</h3>
+        <p>Gateway and model wired into your reporting pipeline and internal tooling. Rate limits and budgets set per analyst. Grafana dashboard handed to whoever owns AI risk on your side.</p>
+      </div>
+      <div class="tier">
+        <p class="eyebrow">03 — Full Programme</p>
+        <h3>Trained on your own history</h3>
+        <p>The model is fine-tuned further on your firm's own anonymised engagement archive and report style — the advantage compounds with every job you close, and it isn't something a competitor can buy off the shelf.</p>
+      </div>
+    </div>
+
+    <div class="compliance">
+      <div class="compliance-item">Built around UK GDPR / Data Protection Act 2018 data-minimisation principles — pseudonymise before transmission, not after a breach.</div>
+      <div class="compliance-item">Architecture follows NCSC guidance on safe adoption of AI tooling: least data, least trust, full audit trail.</div>
+      <div class="compliance-item">On-premise deployment available for engagements that cannot touch third-party infrastructure at all.</div>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <span class="eyebrow">Request a briefing</span>
+    <h2>Fifteen minutes. We show the redaction pipeline live, on a prompt you write.</h2>
+    <a class="cta" href="mailto:zi3lak@gmail.com?subject=CSS%20AI%20Red%20Team%20—%20Briefing%20Request">Request a briefing →</a>
+    <div class="closing-meta">zi3lak@gmail.com &nbsp;·&nbsp; CyberSentinel Solutions Ltd &nbsp;·&nbsp; response within one business day</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="width:100%; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+    <span>CYBERSENTINEL SOLUTIONS LTD — INTERNAL BRIEFING DOCUMENT</span>
+    <span>NOT FOR EXTERNAL DISTRIBUTION WITHOUT AUTHORISATION</span>
+  </div>
+</footer>
