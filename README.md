@@ -15,6 +15,22 @@ Two systems, built together, deployed together:
 
 Together: your team gets AI-accelerated pentesting *without* the compliance exposure that comes from pasting client infrastructure into a public chatbot.
 
+## 📡 Live from the build — real Grafana, not mockups
+
+No stock dashboards, no fake metrics — these are screenshots of the actual monitoring stack watching the actual training run, taken straight off our Grafana instance.
+
+**Mission control** — pod status, dual-GPU utilisation over time, both cards driven by live Prometheus scrapes:
+
+![Mission control dashboard](screenshots/01-mission-control.png)
+
+**Judge says it's working** — an independent model (GLM-5.2) blind-scores base vs. fine-tuned on the same questions, every release. 80% win rate, not a vibe:
+
+![Eval and fine-tune dashboard](screenshots/02-eval-finetune.png)
+
+**The knowledge base, growing live** — 67K+ vectors indexed across four technical corpora, dataset composition tracked by source down to the example:
+
+![RAG index and dataset dashboard](screenshots/03-rag-dataset.png)
+
 ## 📊 The numbers (pulled from the live build)
 
 | | |
