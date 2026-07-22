@@ -37,7 +37,7 @@ The redaction engine, the fine-tuning pipeline, the RAG ingestion, and the model
 
 ## 📬 Want this in your pipeline?
 
-**zi3lak@gmail.com** — 15 minutes, we show the redaction pipeline live on a prompt you write.
+**support@cybersentinelsolutionsltd.co.uk** — 15 minutes, we show the redaction pipeline live on a prompt you write.
 
 ---
 
