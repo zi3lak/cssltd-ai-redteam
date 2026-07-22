@@ -15,6 +15,8 @@ Two systems, built together, deployed together:
 
 Together: your team gets AI-accelerated pentesting *without* the compliance exposure that comes from pasting client infrastructure into a public chatbot.
 
+**Neither system is a one-time snapshot.** The knowledge base behind cssltd-redteam is re-ingested and re-indexed on an ongoing basis, and every release gets re-benchmarked against the base model before it ships — the numbers below move because the underlying system keeps running, not because we refreshed a screenshot.
+
 ## 📡 Live from the build — real Grafana, not mockups
 
 No stock dashboards, no fake metrics — these are screenshots of the actual monitoring stack watching the actual training run, taken straight off our Grafana instance.
@@ -40,6 +42,7 @@ No stock dashboards, no fake metrics — these are screenshots of the actual mon
 | 🗂️ **4** | independent technical corpora feeding retrieval, continuously updated |
 | ⚖️ **80%** | win rate vs. the base model, scored by an independent judge model on every release |
 | 🕳️ **0** | engagement identifiers ever stored by an external model provider |
+| 📡 **Live** | knowledge base and benchmark both re-verified continuously — watch it move on the dashboard above, not a static screenshot |
 
 ## 🇬🇧 Built for UK engagements
 
